@@ -1,104 +1,112 @@
-<!--
-  TAREA TA06 – HomePage
-  Formulario dinámico: los campos se definen en el array "campos" del componente.
-  El HTML no sabe cuántos ni qué campos hay; solo itera con @for.
--->
-
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-       Mi Aplicación
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content [fullscreen]="true">
-
-  <!-- ===== TODO TA06 – Formulario DINÁMICO ====================================
-       Los campos se generan con @for a partir del array "campos" del componente.
-
-       DIFERENCIA CON UN FORMULARIO ESTÁTICO:
-         Estático  →  cada <ion-item> y <ion-input> está codificado a mano en el HTML,
-                      uno por cada campo (nombre, descripcion, categoria...).
-         Dinámico  →  un solo bloque @for recorre "campos" y genera todos los inputs.
-                      Para añadir un campo nuevo solo hay que añadir un objeto al array
-                      en el TypeScript; este HTML no hay que tocarlo.
-  =========================================================================== -->
-  <ion-card class="form-compacto">
-    <ion-card-header>
-      <ion-card-title>Añadir elemento (formulario dinámico)</ion-card-title>
-    </ion-card-header>
-
-    <ion-card-content>
-      <form [formGroup]="formularioDinamico" (ngSubmit)="agregarElemento()">
-
-        <!-- TODO TA06: @for recorre "campos" y genera un ion-item por cada entrada.
-          -- El track campo.name garantiza la eficiencia en el renderizado. 
-          -- Añadir ion-iteme, ion-label y ion-input
-          -->
-
+<!-- 
+  TAREA TA06 – HomePage 
+  Formulario dinámico: los campos se definen en el array "campos" del componente. 
+  El HTML no sabe cuántos ni qué campos hay; solo itera con @for. 
+--> 
+ 
+<ion-header [translucent]="true"> 
+  <ion-toolbar> 
+    <ion-title> 
+       Mi Aplicación 
+    </ion-title> 
+  </ion-toolbar> 
+</ion-header> 
+ 
+<ion-content [fullscreen]="true"> 
+ 
+  <!-- ===== TODO TA06 – Formulario DINÁMICO ==================================== 
+       Los campos se generan con @for a partir del array "campos" del componente. 
+ 
+       DIFERENCIA CON UN FORMULARIO ESTÁTICO: 
+         Estático  →  cada <ion-item> y <ion-input> está codificado a mano en el HTML, 
+                      uno por cada campo (nombre, descripcion, categoria...). 
+         Dinámico  →  un solo bloque @for recorre "campos" y genera todos los inputs. 
+                      Para añadir un campo nuevo solo hay que añadir un objeto al array 
+                      en el TypeScript; este HTML no hay que tocarlo. 
+  =========================================================================== --> 
+  <ion-card class="form-compacto"> 
+    <ion-card-header> 
+      <ion-card-title>Añadir elemento (formulario dinámico)</ion-card-title> 
+    </ion-card-header> 
+ 
+    <ion-card-content> 
+      <form [formGroup]="formularioDinamico" (ngSubmit)="agregarElemento()"> 
+ 
+        <!-- TODO TA06: @for recorre "campos" y genera un ion-item por cada entrada. 
+             track campo.name garantiza la eficiencia en el renderizado. --> 
+        @for (campo of campos; track campo.name) { 
+          <ion-item> 
+            <ion-label position="stacked">{{ campo.label }}</ion-label> 
+            <ion-input 
+              [formControlName]="campo.name" 
+              [type]="campo.type" 
+              [placeholder]="campo.label"> 
+            </ion-input> 
+          </ion-item> 
+ 
           <!-- Errores genéricos para cada campo: sirven para cualquier campo del array. 
-            -- Mediante @if habrá que comprobar si que campo.name no es válido y está "touched"
-            -- Si cumple esta condición, gestionar los errores "required" y "minlenght" y mostrarlos en un ion-note
-            -->
-
-        <ion-button expand="block" type="submit" class="ion-margin-top">
-          Añadir elemento
-        </ion-button>
-
-      </form>
-    </ion-card-content>
-  </ion-card>
-
-
-  <hr class="separador" />
-
-  <!-- TODO TA06 – Búsqueda reactiva con signal
-       "busqueda" es un signal<string>. Usamos [value] para leer su valor actual y
-       (ionInput) para actualizarlo con busqueda.set(). Cada vez que cambia,
-       el computed "elementosFiltrados" se recalcula automáticamente. -->
-  <ion-item>
-    <ion-input placeholder="Buscar elemento..."></ion-input>
-  </ion-item>
-
-  <!-- TODO TA06 – Lista generada desde un computed signal
-       "elementosFiltrados" es computed<Elemento[]>(): se recalcula solo cuando
-       cambia "busqueda" o "elementos". 
-    -- El @for itera sobre su valor (llamada como función)
-       y usa track elemento.id para que Angular reutilice nodos del DOM eficientemente. 
-    -- Dentro de ion-item, mediante (click) llamaremos al método verDetalle
-    -->
-  <ion-list>
-
-      <!-- TODO TA06 – Pipes declarativos en el template:
-        -- ion-item button="true" convierte una fila de lista en área clicable completa, mientras que ion-button es un botón de acción puntual.
-      -->     
-           
-      <ion-item button="true">
-        <ion-label>
-          <!-- | titlecase  →  capitaliza la primera letra de cada palabra (Angular CommonModule) -->
-          <h2></h2>
-          <!-- | slice:0:60 →  recorta la descripción a 60 caracteres para mostrar un resumen 
-            -- Después añadimo {{ elemento.descripcion.length > 60 ? '...' : '' }} para añadir ... si la descripción tiene más de 60 caracteres
-          -->
-          <p></p>
-        </ion-label>
-      </ion-item>
-
-  </ion-list>
-
-  <!-- TODO TA06 – Botón deshabilitado con computed signal
-       "hayElementos" es computed<boolean>(): devuelve true si el array de elementos
-       tiene al menos un elemento. [disabled]="!hayElementos()" enlaza el estado del
-       botón al signal de forma reactiva, sin necesidad de variables booleanas extra. -->
-  <ion-button expand="block" (click)="mostrarToast()">
-    Mostrar mensaje
-  </ion-button>
-
-</ion-content>
-
-<ion-footer>
-  <ion-toolbar>
-    <ion-title>Footer Tarea TA06 - Validaciones y Formulario Dinámico</ion-title>
-  </ion-toolbar>
+               Si añadimos un Validator más al TS, habrá que añadir otro @if para esa validación --> 
+          @if (formularioDinamico.get(campo.name)?.invalid && formularioDinamico.get(campo.name)?.touched) { 
+            @if (formularioDinamico.get(campo.name)?.errors?.['required']) { 
+              <ion-note color="danger" class="error-obligatorio">{{ campo.label }} es obligatorio.</ion-note> 
+            } 
+            @if (formularioDinamico.get(campo.name)?.errors?.['minlength']) { 
+              <ion-note color="danger" class="error-obligatorio"> 
+                Mínimo {{ formularioDinamico.get(campo.name)?.errors?.['minlength']?.requiredLength }} caracteres. 
+              </ion-note> 
+            } 
+          } 
+        } 
+ 
+        <ion-button expand="block" type="submit" class="ion-margin-top"> 
+          Añadir elemento 
+        </ion-button> 
+ 
+      </form> 
+    </ion-card-content> 
+  </ion-card> 
+ 
+ 
+  <hr class="separador" /> 
+ 
+  <!-- TODO TA06 – Búsqueda reactiva con signal 
+       "busqueda" es un signal<string>. Usamos [value] para leer su valor actual y 
+       (ionInput) para actualizarlo con busqueda.set(). Cada vez que cambia, 
+       el computed "elementosFiltrados" se recalcula automáticamente. --> 
+  <ion-item> 
+    <ion-input [value]="busqueda()" (ionInput)="busqueda.set($event.detail.value ?? '')" placeholder="Buscar elemento..."></ion-input> 
+  </ion-item> 
+ 
+  <!-- TODO TA06 – Lista generada desde un computed signal 
+       "elementosFiltrados" es computed<Elemento[]>(): se recalcula solo cuando 
+       cambia "busqueda" o "elementos". El @for itera sobre su valor (llamada como función) 
+       y usa track elemento.id para que Angular reutilice nodos del DOM eficientemente. --> 
+  <ion-list> 
+    @for (elemento of elementosFiltrados(); track elemento.id) { 
+      <!-- TODO TA06 – Pipes declarativos en el template: 
+           | titlecase  →  capitaliza la primera letra de cada palabra (Angular CommonModule) 
+           | slice:0:60 →  recorta la descripción a 60 caracteres para mostrar un resumen --> 
+      <ion-item button="true" (click)="verDetalle(elemento)"> 
+        <ion-label> 
+          <h2>{{ elemento.nombre | titlecase }}</h2> 
+          <p>{{ elemento.descripcion | slice:0:60 }}{{ elemento.descripcion.length > 60 ? '...' : '' }}</p> 
+        </ion-label> 
+      </ion-item> 
+    } 
+  </ion-list> 
+ 
+  <!-- TODO TA06 – Botón deshabilitado con computed signal 
+       "hayElementos" es computed<boolean>(): devuelve true si el array de elementos 
+       tiene al menos un elemento. [disabled]="!hayElementos()" enlaza el estado del 
+       botón al signal de forma reactiva, sin necesidad de variables booleanas extra. --> 
+  <ion-button expand="block" [disabled]="!hayElementos()" (click)="mostrarToast()"> 
+    Mostrar mensaje 
+  </ion-button> 
+ 
+</ion-content> 
+ 
+<ion-footer> 
+  <ion-toolbar> 
+    <ion-title>Footer Tarea TA06 - Validaciones y Formulario Dinámico</ion-title> 
+  </ion-toolbar> 
 </ion-footer>
