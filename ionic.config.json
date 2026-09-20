@@ -1,0 +1,7 @@
+{
+  "name": "DI01_TA06_Ejercicios",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
